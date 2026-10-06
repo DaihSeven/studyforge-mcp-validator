@@ -1,0 +1,1 @@
+# studyforge-mcp-validator
