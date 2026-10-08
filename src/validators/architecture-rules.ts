@@ -11,7 +11,7 @@ export const ARCHITECTURE_RULES = {
       'axios',
       'express',
     ],
-    severity: 'error',
+    severity: 'error' as const,
     message: 'Domain libs NEVER can import Node APIs, NestJS, or Prisma. HARDCODED.',
   },
 
@@ -23,7 +23,7 @@ export const ARCHITECTURE_RULES = {
     api: ['scope:shared', 'scope:import', 'scope:identity', 'scope:quiz', 'scope:course'],
     web: ['scope:shared'],
     shared: ['scope:shared'],
-  },
+  } as Record<string, string[]>,
 
   requires_organization_id: {
     entities: [
@@ -36,7 +36,7 @@ export const ARCHITECTURE_RULES = {
       'Course',
     ],
     exception: ['User'],
-    severity: 'error',
+    severity: 'error' as const,
     message:
       'Entity MUST have organizationId (except User). This is a domain invariant, not optional.',
   },
@@ -49,23 +49,23 @@ export const ARCHITECTURE_RULES = {
       { from: 'identity', to: 'quiz' },
     ],
     communication: 'via shared/contracts ONLY',
-    severity: 'error',
+    severity: 'error' as const,
   },
 
   entity_pattern: {
     required: ['Object.freeze', 'instanceof EntityId', 'private constructor'],
-    severity: 'error',
+    severity: 'error' as const,
     message: 'Entity must be immutable (Object.freeze) and use private constructor.',
   },
 };
 
-export function validateArchitecture(libName, libType, imports) {
-  const errors = [];
+export function validateArchitecture(libName: string, libType: string, imports: string[]): string[] {
+  const errors: string[] = [];
 
   if (libType === 'domain') {
     const blocked = ARCHITECTURE_RULES.domain_no_external.blocked;
-    imports.forEach((imp) => {
-      if (blocked.some((b) => imp.includes(b))) {
+    imports.forEach((imp: string) => {
+      if (blocked.some((b: string) => imp.includes(b))) {
         errors.push(
           `❌ Domain lib "${libName}" imports "${imp}". ${ARCHITECTURE_RULES.domain_no_external.message}`,
         );
@@ -76,16 +76,16 @@ export function validateArchitecture(libName, libType, imports) {
   return errors;
 }
 
-export function validateScopeBoundary(scope, imports) {
-  const errors = [];
-  const allowed = ARCHITECTURE_RULES.scope_boundaries[scope];
+export function validateScopeBoundary(scope: string, imports: string[]): string[] {
+  const errors: string[] = [];
+  const allowed = ARCHITECTURE_RULES.scope_boundaries[scope as keyof typeof ARCHITECTURE_RULES.scope_boundaries];
 
   if (!allowed) {
     errors.push(`❌ Unknown scope: ${scope}`);
     return errors;
   }
 
-  imports.forEach((imp) => {
+  imports.forEach((imp: string) => {
     const importScope = extractScope(imp);
     if (!allowed.includes(importScope)) {
       errors.push(
@@ -97,7 +97,7 @@ export function validateScopeBoundary(scope, imports) {
   return errors;
 }
 
-function extractScope(importPath) {
+function extractScope(importPath: string): string {
   const match = importPath.match(/@studyforge\/(\w+)/);
   return match ? `scope:${match[1]}` : 'unknown';
 }

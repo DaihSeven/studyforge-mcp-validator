@@ -1,4 +1,10 @@
-export const ADR_SECTIONS = [
+export interface ADRRequirement {
+  section: string;
+  required: boolean;
+  minLength: number;
+}
+
+export const ADR_SECTIONS: ADRRequirement[] = [
   { section: 'Title', required: true, minLength: 5 },
   { section: 'Status', required: true, minLength: 3 },
   { section: 'Context', required: true, minLength: 20 },
@@ -8,10 +14,10 @@ export const ADR_SECTIONS = [
   { section: 'Related ADRs', required: false, minLength: 0 },
 ];
 
-export function validateADR(adrText) {
-  const errors = [];
+export function validateADR(adrText: string): string[] {
+  const errors: string[] = [];
 
-  ADR_SECTIONS.forEach(({ section, required, minLength }) => {
+  ADR_SECTIONS.forEach(({ section, required, minLength }: ADRRequirement) => {
     const regex = new RegExp(`##\\s*${section}`, 'i');
     const found = regex.test(adrText);
 

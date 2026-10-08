@@ -1,7 +1,7 @@
 export interface ValidationResult {
   valid: boolean;
   errors: ValidationError[];
-  warnings: string[];
+  warnings: ValidationError[];
 }
 
 export interface ValidationError {
